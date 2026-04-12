@@ -1,8 +1,16 @@
+import { useRoute } from "./router.ts";
+import { ProjectList } from "./components/project-list.tsx";
+import { TemplateList } from "./components/template-list.tsx";
+import { ScriptWorkspace } from "./components/script-workspace.tsx";
+
 export const App = () => {
+  const route = useRoute();
+
   return (
-    <div className="min-h-screen p-4">
-      <h1 className="text-2xl font-bold">YouTube Script Tool</h1>
-      <p className="mt-2 text-gray-500">Coming soon</p>
+    <div className="min-h-screen bg-neutral-50">
+      {route.page === "projects" && <ProjectList />}
+      {route.page === "templates" && <TemplateList />}
+      {route.page === "workspace" && <ScriptWorkspace projectId={route.projectId} />}
     </div>
   );
 };

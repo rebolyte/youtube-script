@@ -60,10 +60,9 @@ export const makeProjectsDomain = ({ db }: Deps) => ({
           .updateTable("projects")
           .set({
             ...(input.name !== undefined ? { name: input.name } : {}),
-            ...(input.braindump !== undefined
-              ? { braindump: JSON.stringify(input.braindump) }
-              : {}),
-            ...(input.script !== undefined ? { script: JSON.stringify(input.script) } : {}),
+            ...(input.templateId !== undefined ? { templateId: input.templateId } : {}),
+            ...(input.braindump !== undefined ? { braindump: input.braindump } : {}),
+            ...(input.script !== undefined ? { script: input.script } : {}),
             updatedAt: sql`CURRENT_TIMESTAMP`,
           })
           .where("id", "=", id)
@@ -74,7 +73,10 @@ export const makeProjectsDomain = ({ db }: Deps) => ({
 
   delete: (id: string) =>
     Result.tryPromise({
-      try: () => db.deleteFrom("projects").where("id", "=", id).executeTakeFirstOrThrow(),
+      try: async () => {
+        await db.deleteFrom("projects").where("id", "=", id).execute();
+        return { deleted: true };
+      },
       catch: dbError("Failed to delete project"),
     }),
 });

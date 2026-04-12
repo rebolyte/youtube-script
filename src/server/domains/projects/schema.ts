@@ -7,6 +7,7 @@ export const CreateProjectSchema = z.object({
 
 export const UpdateProjectSchema = z.object({
   name: z.string().min(1).optional(),
+  templateId: z.string().min(1).optional(),
   braindump: z.any().optional(),
   script: z.any().optional(),
 });

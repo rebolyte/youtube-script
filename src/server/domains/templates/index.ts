@@ -59,7 +59,10 @@ export const makeTemplatesDomain = ({ db }: Deps) => ({
 
   delete: (id: string) =>
     Result.tryPromise({
-      try: () => db.deleteFrom("templates").where("id", "=", id).executeTakeFirstOrThrow(),
+      try: async () => {
+        await db.deleteFrom("templates").where("id", "=", id).execute();
+        return { deleted: true };
+      },
       catch: dbError("Failed to delete template"),
     }),
 });
