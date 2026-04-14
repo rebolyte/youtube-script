@@ -1,41 +1,36 @@
-import { useEffect, useRef, useCallback } from "react";
-import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
+import { useEffect, useRef } from "react";
+import { useEditor, EditorContent, type JSONContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { Toolbar } from "../editor/toolbar.tsx";
 
 type Props = {
-  initialContent: string;
-  onSave: (text: string) => void;
+  initialContent: JSONContent | null;
+  onSave: (doc: JSONContent) => void;
 };
 
 export const BraindumpEditor = ({ initialContent, onSave }: Props) => {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hydrated = useRef(false);
 
-  const editor = useCreateBlockNote({});
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: initialContent ?? { type: "doc", content: [{ type: "paragraph" }] },
+    onUpdate: ({ editor }) => {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => onSave(editor.getJSON()), 500);
+    },
+  });
 
   useEffect(() => {
-    if (hydrated.current || !initialContent) return;
+    if (!editor || hydrated.current || !initialContent) return;
     hydrated.current = true;
-    void (async () => {
-      const blocks = await editor.tryParseMarkdownToBlocks(initialContent);
-      editor.replaceBlocks(editor.document, blocks);
-    })();
+    editor.commands.setContent(initialContent);
   }, [initialContent, editor]);
 
-  const handleChange = useCallback(() => {
-    clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      const markdown = editor.blocksToMarkdownLossy(editor.document);
-      onSave(markdown);
-    }, 500);
-  }, [editor, onSave]);
-
   return (
-    <BlockNoteView
-      editor={editor}
-      onChange={handleChange}
-      theme="light"
-    />
+    <>
+      <Toolbar editor={editor} />
+      <EditorContent editor={editor} />
+    </>
   );
 };

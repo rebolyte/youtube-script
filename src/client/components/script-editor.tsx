@@ -1,44 +1,62 @@
-import { useEffect, useRef, useCallback } from "react";
-import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
+import { useEffect, useRef, useMemo } from "react";
+import { useEditor, EditorContent, type JSONContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { SectionNode } from "../editor/section-node.tsx";
+import { Toolbar } from "../editor/toolbar.tsx";
 import type { TemplateSection } from "../../server/domains/templates/schema.ts";
 
 type Props = {
   sections: TemplateSection[];
-  content: string;
-  onSave: (text: string) => void;
+  content: JSONContent | null;
+  onSave: (doc: JSONContent) => void;
 };
 
-export const ScriptEditor = ({ sections: _sections, content, onSave }: Props) => {
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const lastContent = useRef("");
+const flattenSections = (sections: TemplateSection[]): { key: string; label: string }[] =>
+  sections.flatMap((s) =>
+    s.children?.length
+      ? s.children.map((c) => ({ key: c.key, label: `${s.label} — ${c.label}` }))
+      : [{ key: s.key, label: s.label }],
+  );
 
-  const editor = useCreateBlockNote({});
+const emptySectionDoc = (flat: { key: string; label: string }[]): JSONContent => ({
+  type: "doc",
+  content: flat.map((s) => ({
+    type: "section",
+    attrs: { label: s.label },
+    content: [{ type: "paragraph" }],
+  })),
+});
+
+export const ScriptEditor = ({ sections: templateSections, content, onSave }: Props) => {
+  const flat = useMemo(() => flattenSections(templateSections), [templateSections]);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const lastContentRef = useRef<JSONContent | null>(null);
+
+  const initialDoc = content ?? emptySectionDoc(flat);
+
+  const editor = useEditor({
+    extensions: [StarterKit, SectionNode],
+    content: initialDoc,
+    onUpdate: ({ editor }) => {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => {
+        const json = editor.getJSON();
+        lastContentRef.current = json;
+        onSave(json);
+      }, 500);
+    },
+  });
 
   useEffect(() => {
-    if (!content || content === lastContent.current) return;
-    lastContent.current = content;
-    void (async () => {
-      const blocks = await editor.tryParseMarkdownToBlocks(content);
-      editor.replaceBlocks(editor.document, blocks);
-    })();
+    if (!editor || !content || content === lastContentRef.current) return;
+    lastContentRef.current = content;
+    editor.commands.setContent(content);
   }, [content, editor]);
 
-  const handleChange = useCallback(() => {
-    clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      const markdown = editor.blocksToMarkdownLossy(editor.document);
-      lastContent.current = markdown;
-      onSave(markdown);
-    }, 500);
-  }, [editor, onSave]);
-
   return (
-    <BlockNoteView
-      editor={editor}
-      onChange={handleChange}
-      theme="light"
-    />
+    <>
+      <Toolbar editor={editor} />
+      <EditorContent editor={editor} />
+    </>
   );
 };

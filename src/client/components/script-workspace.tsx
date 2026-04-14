@@ -4,6 +4,24 @@ import { navigate } from "../router.ts";
 import { BraindumpEditor } from "./braindump-editor.tsx";
 import { ScriptEditor } from "./script-editor.tsx";
 import type { TemplateSection } from "../../server/domains/templates/schema.ts";
+import type { JSONContent } from "@tiptap/react";
+import { markdownToSectionDoc } from "../editor/markdown-to-doc.ts";
+
+const flattenSections = (sections: TemplateSection[]): { key: string; label: string }[] =>
+  sections.flatMap((s) =>
+    s.children?.length
+      ? s.children.map((c) => ({ key: c.key, label: `${s.label} — ${c.label}` }))
+      : [{ key: s.key, label: s.label }],
+  );
+
+const tryParseJson = (s: string): JSONContent | null => {
+  if (!s || s === "{}") return null;
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+};
 
 export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
   const [project, setProject] = useState<Project | null>(null);
@@ -11,14 +29,16 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
   const [template, setTemplate] = useState<Template | null>(null);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scriptMarkdown, setScriptMarkdown] = useState<string>("");
-  const braindumpRef = useRef<string>("");
+  const [scriptContent, setScriptContent] = useState<JSONContent | null>(null);
+  const [scriptKey, setScriptKey] = useState(0);
+  const braindumpRef = useRef<JSONContent | null>(null);
 
   useEffect(() => {
     Promise.all([api.projects.get(projectId), api.templates.list()]).then(([p, allTemplates]) => {
       setProject(p);
       setTemplates(allTemplates);
-      braindumpRef.current = p.braindump !== "{}" ? p.braindump : "";
+      braindumpRef.current = tryParseJson(p.braindump);
+      setScriptContent(tryParseJson(p.script));
       const t = allTemplates.find((t) => t.id === p.templateId) ?? null;
       setTemplate(t);
     });
@@ -33,32 +53,35 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
   };
 
   const saveBraindump = useCallback(
-    async (text: string) => {
-      braindumpRef.current = text;
-      await api.projects.update(projectId, { braindump: text });
+    async (doc: JSONContent) => {
+      braindumpRef.current = doc;
+      await api.projects.update(projectId, { braindump: JSON.stringify(doc) });
     },
     [projectId],
   );
 
   const saveScript = useCallback(
-    async (text: string) => {
-      setScriptMarkdown(text);
-      await api.projects.update(projectId, { script: text });
+    async (doc: JSONContent) => {
+      await api.projects.update(projectId, { script: JSON.stringify(doc) });
     },
     [projectId],
   );
 
   const generate = async () => {
-    if (!braindumpRef.current.trim()) {
+    if (!braindumpRef.current) {
       setError("Write some notes in the braindump first");
       return;
     }
     setGenerating(true);
     setError(null);
     try {
-      const result = await api.projects.generate(projectId);
-      setScriptMarkdown(result);
-      await api.projects.update(projectId, { script: result });
+      const markdown = await api.projects.generate(projectId);
+      const sections: TemplateSection[] = template ? JSON.parse(template.sections) : [];
+      const flat = flattenSections(sections);
+      const doc = markdownToSectionDoc(markdown, flat);
+      await api.projects.update(projectId, { script: JSON.stringify(doc) });
+      setScriptContent(doc);
+      setScriptKey((k) => k + 1);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -121,7 +144,7 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
           </div>
           <div className="p-4">
             <BraindumpEditor
-              initialContent={project.braindump !== "{}" ? project.braindump : ""}
+              initialContent={braindumpRef.current}
               onSave={saveBraindump}
             />
           </div>
@@ -136,8 +159,9 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
           </div>
           <div className="p-4">
             <ScriptEditor
+              key={scriptKey}
               sections={sections}
-              content={scriptMarkdown || (project.script !== "{}" ? project.script : "")}
+              content={scriptContent}
               onSave={saveScript}
             />
           </div>
