@@ -11,6 +11,7 @@
         "@logtape/logtape": "^2.0.5",
         "@logtape/pretty": "^2.0.5",
         "@logtape/redaction": "^2.0.5",
+        "@tiptap/extension-document": "^3.22.3",
         "@tiptap/extension-list": "^3.22.3",
         "@tiptap/extension-subscript": "^3.22.3",
         "@tiptap/extension-superscript": "^3.22.3",

@@ -48,7 +48,9 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
     const t = templates.find((t) => t.id === templateId);
     if (!t) return;
     setTemplate(t);
-    await api.projects.update(projectId, { templateId });
+    setScriptContent(null);
+    setScriptKey((k) => k + 1);
+    await api.projects.update(projectId, { templateId, script: "{}" });
     setProject((p) => (p ? { ...p, templateId } : p));
   };
 

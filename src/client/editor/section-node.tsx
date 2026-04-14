@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent, type ReactNode
 
 const SectionView = ({ node }: ReactNodeViewProps) => (
   <NodeViewWrapper className="script-section">
-    <div className="script-section-header" data-drag-handle="">
+    <div className="script-section-header" contentEditable={false} data-drag-handle="">
       <span className="script-section-drag">⠿</span>
       {node.attrs.label as string}
     </div>
@@ -13,10 +13,11 @@ const SectionView = ({ node }: ReactNodeViewProps) => (
 
 export const SectionNode = Node.create({
   name: "section",
-  group: "block",
+  group: "section",
   content: "block+",
   draggable: true,
   isolating: true,
+  defining: true,
 
   addAttributes() {
     return {
