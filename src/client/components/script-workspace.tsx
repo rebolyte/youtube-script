@@ -145,10 +145,7 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
             </span>
           </div>
           <div className="p-4">
-            <BraindumpEditor
-              initialContent={braindumpRef.current}
-              onSave={saveBraindump}
-            />
+            <BraindumpEditor initialContent={braindumpRef.current} onSave={saveBraindump} />
           </div>
         </div>
 

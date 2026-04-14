@@ -12,9 +12,7 @@ type Props = {
   onSave: (doc: JSONContent) => void;
 };
 
-const flattenSections = (
-  sections: TemplateSection[],
-): { key: string; label: string }[] =>
+const flattenSections = (sections: TemplateSection[]): { key: string; label: string }[] =>
   sections.flatMap((s) =>
     s.children?.length
       ? s.children.map((c) => ({
@@ -24,9 +22,7 @@ const flattenSections = (
       : [{ key: s.key, label: s.label }],
   );
 
-const emptySectionDoc = (
-  flat: { key: string; label: string }[],
-): JSONContent => ({
+const emptySectionDoc = (flat: { key: string; label: string }[]): JSONContent => ({
   type: "doc",
   content: flat.map((s) => ({
     type: "section",
@@ -36,25 +32,12 @@ const emptySectionDoc = (
 });
 
 const SectionDocument = Document.extend({ content: "section+" });
-const extensions = [
-  StarterKit.configure({ document: false }),
-  SectionDocument,
-  SectionNode,
-];
+const extensions = [StarterKit.configure({ document: false }), SectionDocument, SectionNode];
 
-export const ScriptEditor = ({
-  sections: templateSections,
-  content,
-  onSave,
-}: Props) => {
-  const flat = useMemo(
-    () => flattenSections(templateSections),
-    [templateSections],
-  );
+export const ScriptEditor = ({ sections: templateSections, content, onSave }: Props) => {
+  const flat = useMemo(() => flattenSections(templateSections), [templateSections]);
   const initialDoc = content ?? emptySectionDoc(flat);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleUpdate = useCallback(
     ({ editor }: { editor: any }) => {

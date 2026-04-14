@@ -6,10 +6,7 @@ type FlatSection = { key: string; label: string };
 
 const innerExtensions: Extensions = [StarterKit];
 
-export const markdownToSectionDoc = (
-  md: string,
-  flat: FlatSection[],
-): JSONContent => {
+export const markdownToSectionDoc = (md: string, flat: FlatSection[]): JSONContent => {
   const lines = md.split("\n");
   const chunks: { label: string; body: string }[] = [];
   let current: { label: string; lines: string[] } | null = null;
@@ -59,7 +56,9 @@ const markdownToHtml = (md: string): string => {
       if (!trimmed) return "";
       const listLines = trimmed.split("\n").filter((l) => /^[-*] /.test(l));
       if (listLines.length === trimmed.split("\n").filter(Boolean).length && listLines.length > 0) {
-        const items = listLines.map((l) => `<li><p>${escapeHtml(l.replace(/^[-*] /, ""))}</p></li>`);
+        const items = listLines.map(
+          (l) => `<li><p>${escapeHtml(l.replace(/^[-*] /, ""))}</p></li>`,
+        );
         return `<ul>${items.join("")}</ul>`;
       }
       return `<p>${escapeHtml(trimmed)}</p>`;

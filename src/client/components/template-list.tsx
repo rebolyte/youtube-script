@@ -16,10 +16,7 @@ export const TemplateList = () => {
         <h1 className="text-xl font-bold mb-4">Templates</h1>
         <ul className="space-y-2">
           {templates.map((t) => (
-            <li
-              key={t.id}
-              className="rounded border border-neutral-200 bg-white px-4 py-3"
-            >
+            <li key={t.id} className="rounded border border-neutral-200 bg-white px-4 py-3">
               <div className="font-medium text-sm">{t.name}</div>
               {t.description && (
                 <div className="text-xs text-neutral-400 mt-1">{t.description}</div>

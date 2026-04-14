@@ -1,5 +1,10 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent, type ReactNodeViewProps } from "@tiptap/react";
+import {
+  ReactNodeViewRenderer,
+  NodeViewWrapper,
+  NodeViewContent,
+  type ReactNodeViewProps,
+} from "@tiptap/react";
 
 const SectionView = ({ node }: ReactNodeViewProps) => (
   <NodeViewWrapper className="script-section">
@@ -30,11 +35,7 @@ export const SectionNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      "div",
-      mergeAttributes(HTMLAttributes, { "data-type": "section" }),
-      0,
-    ];
+    return ["div", mergeAttributes(HTMLAttributes, { "data-type": "section" }), 0];
   },
 
   addNodeView() {

@@ -18,7 +18,10 @@ export const ProjectList = () => {
 
   const create = async () => {
     if (!newName.trim() || !defaultTemplateId) return;
-    const project = await api.projects.create({ name: newName.trim(), templateId: defaultTemplateId });
+    const project = await api.projects.create({
+      name: newName.trim(),
+      templateId: defaultTemplateId,
+    });
     navigate(`/project/${project.id}`);
   };
 
