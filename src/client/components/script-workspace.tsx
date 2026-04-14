@@ -7,10 +7,15 @@ import type { TemplateSection } from "../../server/domains/templates/schema.ts";
 import type { JSONContent } from "@tiptap/react";
 import { markdownToSectionDoc } from "../editor/markdown-to-doc.ts";
 
-const flattenSections = (sections: TemplateSection[]): { key: string; label: string }[] =>
+const flattenSections = (
+  sections: TemplateSection[],
+): { key: string; label: string }[] =>
   sections.flatMap((s) =>
     s.children?.length
-      ? s.children.map((c) => ({ key: c.key, label: `${s.label} — ${c.label}` }))
+      ? s.children.map((c) => ({
+          key: c.key,
+          label: `${s.label} — ${c.label}`,
+        }))
       : [{ key: s.key, label: s.label }],
   );
 
@@ -34,20 +39,27 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
   const braindumpRef = useRef<JSONContent | null>(null);
 
   useEffect(() => {
-    Promise.all([api.projects.get(projectId), api.templates.list()]).then(([p, allTemplates]) => {
-      setProject(p);
-      setTemplates(allTemplates);
-      braindumpRef.current = tryParseJson(p.braindump);
-      setScriptContent(tryParseJson(p.script));
-      const t = allTemplates.find((t) => t.id === p.templateId) ?? null;
-      setTemplate(t);
-    });
+    Promise.all([api.projects.get(projectId), api.templates.list()]).then(
+      ([p, allTemplates]) => {
+        setProject(p);
+        setTemplates(allTemplates);
+        braindumpRef.current = tryParseJson(p.braindump);
+        setScriptContent(tryParseJson(p.script));
+        const t = allTemplates.find((t) => t.id === p.templateId) ?? null;
+        setTemplate(t);
+      },
+    );
   }, [projectId]);
 
   const switchTemplate = async (templateId: string) => {
     const t = templates.find((t) => t.id === templateId);
     if (!t) return;
-    if (!window.confirm("Switching templates will clear the current script. Continue?")) return;
+    if (
+      !window.confirm(
+        "Switching templates will clear the current script. Continue?",
+      )
+    )
+      return;
     setTemplate(t);
     setScriptContent(null);
     setScriptKey((k) => k + 1);
@@ -80,10 +92,14 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
     try {
       const markdown = await api.projects.generate(projectId);
       if (!markdown.includes("## ")) {
-        setError(`Generation did not produce a structured script: ${markdown.slice(0, 200)}`);
+        setError(
+          `Generation did not produce a structured script: ${markdown.slice(0, 200)}`,
+        );
         return;
       }
-      const sections: TemplateSection[] = template ? JSON.parse(template.sections) : [];
+      const sections: TemplateSection[] = template
+        ? JSON.parse(template.sections)
+        : [];
       const flat = flattenSections(sections);
       const doc = markdownToSectionDoc(markdown, flat);
       await api.projects.update(projectId, { script: JSON.stringify(doc) });
@@ -144,19 +160,22 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
       <div className="flex flex-1 overflow-hidden">
         {/* Braindump pane */}
         <div className="flex-1 border-r border-neutral-200 overflow-auto">
-          <div className="px-4 py-2 border-b border-neutral-100 bg-neutral-50">
+          <div className="px-4 py-2 border-b border-neutral-100 bg-gray-100">
             <span className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
               Braindump
             </span>
           </div>
           <div className="p-4">
-            <BraindumpEditor initialContent={braindumpRef.current} onSave={saveBraindump} />
+            <BraindumpEditor
+              initialContent={braindumpRef.current}
+              onSave={saveBraindump}
+            />
           </div>
         </div>
 
         {/* Script pane */}
         <div className="flex-1 overflow-auto">
-          <div className="px-4 py-2 border-b border-neutral-100 bg-neutral-50">
+          <div className="px-4 py-2 border-b border-neutral-100 bg-gray-100">
             <span className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
               Script
             </span>

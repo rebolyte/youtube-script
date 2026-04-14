@@ -7,10 +7,12 @@ export const App = () => {
   const route = useRoute();
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-gray-100">
       {route.page === "projects" && <ProjectList />}
       {route.page === "templates" && <TemplateList />}
-      {route.page === "workspace" && <ScriptWorkspace projectId={route.projectId} />}
+      {route.page === "workspace" && (
+        <ScriptWorkspace projectId={route.projectId} />
+      )}
     </div>
   );
 };

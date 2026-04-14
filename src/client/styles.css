@@ -17,49 +17,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.script-section {
-  border: 1px solid #e0e7ff;
-  border-left: 3px solid #6366f1;
-  border-radius: 6px;
-  background: white;
-  transition: box-shadow 0.15s;
-  margin: 12px 0;
-}
-
-.script-section:hover {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-}
-
-.script-section-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: #f5f3ff;
-  border-bottom: 1px solid #e0e7ff;
-  border-radius: 6px 6px 0 0;
-  font-weight: 600;
-  font-size: 0.75rem;
-  color: #4338ca;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  user-select: none;
-  cursor: grab;
-}
-
-.script-section-header:active {
-  cursor: grabbing;
-}
-
-.script-section-drag {
-  color: #a5b4fc;
-  font-size: 0.85rem;
-  line-height: 1;
-}
-
-.script-section-body {
-  min-height: 48px;
-  padding: 8px 24px;
+.tiptap {
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .tiptap:focus {
