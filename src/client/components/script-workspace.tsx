@@ -146,14 +146,16 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
       {/* Split pane */}
       <div className="flex flex-1 overflow-hidden">
         {/* Braindump pane */}
-        <div className="flex-1 border-r border-neutral-200 overflow-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-neutral-200">
           <div className="px-4 py-2 border-b border-neutral-100 bg-gray-100">
             <span className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
               Braindump
             </span>
           </div>
-          <div className="p-4">
-            <BraindumpEditor initialContent={braindumpRef.current} onSave={saveBraindump} />
+          <div className="flex flex-1 min-h-0 bg-white p-4">
+            <div className="h-full w-full [&_.ProseMirror]:h-full [&_.ProseMirror]:flex-1 [&_.ProseMirror]:outline-none [&_.tiptap]:flex [&_.tiptap]:h-full [&_.tiptap]:flex-col">
+              <BraindumpEditor initialContent={braindumpRef.current} onSave={saveBraindump} />
+            </div>
           </div>
         </div>
 
