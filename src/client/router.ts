@@ -3,13 +3,17 @@ import { useState, useEffect } from "react";
 export type Route =
   | { page: "projects" }
   | { page: "templates" }
-  | { page: "workspace"; projectId: string };
+  | { page: "workspace"; projectId: string }
+  | { page: "template-editor"; templateId: string | null };
 
 const parseHash = (): Route => {
   const hash = window.location.hash.slice(1) || "/";
   if (hash === "/templates") return { page: "templates" };
-  const match = hash.match(/^\/project\/(.+)$/);
-  if (match) return { page: "workspace", projectId: match[1] };
+  if (hash === "/template/new") return { page: "template-editor", templateId: null };
+  const matchTemplate = hash.match(/^\/template\/(.+)$/);
+  if (matchTemplate) return { page: "template-editor", templateId: matchTemplate[1] };
+  const matchProject = hash.match(/^\/project\/(.+)$/);
+  if (matchProject) return { page: "workspace", projectId: matchProject[1] };
   return { page: "projects" };
 };
 

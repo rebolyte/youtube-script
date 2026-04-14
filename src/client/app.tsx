@@ -2,6 +2,7 @@ import { useRoute } from "./router.ts";
 import { ProjectList } from "./components/project-list.tsx";
 import { TemplateList } from "./components/template-list.tsx";
 import { ScriptWorkspace } from "./components/script-workspace.tsx";
+import { TemplateEditor } from "./components/template-editor.tsx";
 
 export const App = () => {
   const route = useRoute();
@@ -11,6 +12,9 @@ export const App = () => {
       {route.page === "projects" && <ProjectList />}
       {route.page === "templates" && <TemplateList />}
       {route.page === "workspace" && <ScriptWorkspace projectId={route.projectId} />}
+      {route.page === "template-editor" && (
+        <TemplateEditor key={route.templateId ?? "new"} templateId={route.templateId} />
+      )}
     </div>
   );
 };
