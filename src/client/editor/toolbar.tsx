@@ -3,6 +3,7 @@ import { MarkButton } from "@/components/tiptap-ui/mark-button/mark-button";
 import { ListButton } from "@/components/tiptap-ui/list-button/list-button";
 import { HeadingButton } from "@/components/tiptap-ui/heading-button/heading-button";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button/blockquote-button";
+import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button/undo-redo-button";
 
 export const EditorToolbar = () => (
   <Toolbar>
@@ -21,6 +22,11 @@ export const EditorToolbar = () => (
       <ListButton type="bulletList" />
       <ListButton type="orderedList" />
       <BlockquoteButton />
+    </ToolbarGroup>
+    <ToolbarSeparator />
+    <ToolbarGroup>
+      <UndoRedoButton action="undo" />
+      <UndoRedoButton action="redo" />
     </ToolbarGroup>
   </Toolbar>
 );

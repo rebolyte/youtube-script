@@ -23,6 +23,7 @@ body {
   border-radius: 6px;
   background: white;
   transition: box-shadow 0.15s;
+  margin: 12px 0;
 }
 
 .script-section:hover {
@@ -58,10 +59,7 @@ body {
 
 .script-section-body {
   min-height: 48px;
-}
-
-.script-section-body .tiptap {
-  padding: 4px 8px;
+  padding: 8px 24px;
 }
 
 .tiptap:focus {

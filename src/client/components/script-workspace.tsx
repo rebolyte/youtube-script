@@ -47,6 +47,7 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
   const switchTemplate = async (templateId: string) => {
     const t = templates.find((t) => t.id === templateId);
     if (!t) return;
+    if (!window.confirm("Switching templates will clear the current script. Continue?")) return;
     setTemplate(t);
     setScriptContent(null);
     setScriptKey((k) => k + 1);
@@ -78,6 +79,10 @@ export const ScriptWorkspace = ({ projectId }: { projectId: string }) => {
     setError(null);
     try {
       const markdown = await api.projects.generate(projectId);
+      if (!markdown.includes("## ")) {
+        setError(`Generation did not produce a structured script: ${markdown.slice(0, 200)}`);
+        return;
+      }
       const sections: TemplateSection[] = template ? JSON.parse(template.sections) : [];
       const flat = flattenSections(sections);
       const doc = markdownToSectionDoc(markdown, flat);
