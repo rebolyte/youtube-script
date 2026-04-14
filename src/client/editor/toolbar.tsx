@@ -1,52 +1,26 @@
-import type { Editor } from "@tiptap/react";
+import { Toolbar, ToolbarGroup, ToolbarSeparator } from "@/components/tiptap-ui-primitive/toolbar";
+import { MarkButton } from "@/components/tiptap-ui/mark-button/mark-button";
+import { ListButton } from "@/components/tiptap-ui/list-button/list-button";
+import { HeadingButton } from "@/components/tiptap-ui/heading-button/heading-button";
+import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button/blockquote-button";
 
-type Props = { editor: Editor | null };
-
-export const Toolbar = ({ editor }: Props) => {
-  if (!editor) return null;
-
-  const btn = (active: boolean) =>
-    `toolbar-btn${active ? " toolbar-btn-active" : ""}`;
-
-  return (
-    <div className="toolbar">
-      <button
-        className={btn(editor.isActive("bold"))}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-      >
-        B
-      </button>
-      <button
-        className={btn(editor.isActive("italic"))}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-      >
-        I
-      </button>
-      <button
-        className={btn(editor.isActive("strike"))}
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-      >
-        S
-      </button>
-      <span className="toolbar-sep" />
-      <button
-        className={btn(editor.isActive("bulletList"))}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-      >
-        List
-      </button>
-      <button
-        className={btn(editor.isActive("orderedList"))}
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-      >
-        1.
-      </button>
-      <button
-        className={btn(editor.isActive("blockquote"))}
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-      >
-        Quote
-      </button>
-    </div>
-  );
-};
+export const EditorToolbar = () => (
+  <Toolbar>
+    <ToolbarGroup>
+      <MarkButton type="bold" />
+      <MarkButton type="italic" />
+      <MarkButton type="strike" />
+    </ToolbarGroup>
+    <ToolbarSeparator />
+    <ToolbarGroup>
+      <HeadingButton level={2} />
+      <HeadingButton level={3} />
+    </ToolbarGroup>
+    <ToolbarSeparator />
+    <ToolbarGroup>
+      <ListButton type="bulletList" />
+      <ListButton type="orderedList" />
+      <BlockquoteButton />
+    </ToolbarGroup>
+  </Toolbar>
+);

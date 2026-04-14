@@ -1,8 +1,8 @@
-import { useEffect, useRef, useMemo } from "react";
-import { useEditor, EditorContent, type JSONContent } from "@tiptap/react";
+import { useMemo, useRef, useCallback } from "react";
+import { EditorProvider, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { SectionNode } from "../editor/section-node.tsx";
-import { Toolbar } from "../editor/toolbar.tsx";
+import { EditorToolbar } from "../editor/toolbar.tsx";
 import type { TemplateSection } from "../../server/domains/templates/schema.ts";
 
 type Props = {
@@ -27,36 +27,27 @@ const emptySectionDoc = (flat: { key: string; label: string }[]): JSONContent =>
   })),
 });
 
+const extensions = [StarterKit, SectionNode];
+
 export const ScriptEditor = ({ sections: templateSections, content, onSave }: Props) => {
   const flat = useMemo(() => flattenSections(templateSections), [templateSections]);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const lastContentRef = useRef<JSONContent | null>(null);
-
   const initialDoc = content ?? emptySectionDoc(flat);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const editor = useEditor({
-    extensions: [StarterKit, SectionNode],
-    content: initialDoc,
-    onUpdate: ({ editor }) => {
+  const handleUpdate = useCallback(
+    ({ editor }: { editor: any }) => {
       clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => {
-        const json = editor.getJSON();
-        lastContentRef.current = json;
-        onSave(json);
-      }, 500);
+      saveTimer.current = setTimeout(() => onSave(editor.getJSON()), 500);
     },
-  });
-
-  useEffect(() => {
-    if (!editor || !content || content === lastContentRef.current) return;
-    lastContentRef.current = content;
-    editor.commands.setContent(content);
-  }, [content, editor]);
+    [onSave],
+  );
 
   return (
-    <>
-      <Toolbar editor={editor} />
-      <EditorContent editor={editor} />
-    </>
+    <EditorProvider
+      extensions={extensions}
+      content={initialDoc}
+      onUpdate={handleUpdate}
+      slotBefore={<EditorToolbar />}
+    />
   );
 };
