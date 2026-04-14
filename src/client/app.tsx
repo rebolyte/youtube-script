@@ -10,9 +10,7 @@ export const App = () => {
     <div className="min-h-screen bg-gray-100">
       {route.page === "projects" && <ProjectList />}
       {route.page === "templates" && <TemplateList />}
-      {route.page === "workspace" && (
-        <ScriptWorkspace projectId={route.projectId} />
-      )}
+      {route.page === "workspace" && <ScriptWorkspace projectId={route.projectId} />}
     </div>
   );
 };

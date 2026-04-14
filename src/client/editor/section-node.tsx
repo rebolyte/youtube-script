@@ -67,11 +67,7 @@ export const SectionNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      "div",
-      mergeAttributes(HTMLAttributes, { "data-type": "section" }),
-      0,
-    ];
+    return ["div", mergeAttributes(HTMLAttributes, { "data-type": "section" }), 0];
   },
 
   addNodeView() {
